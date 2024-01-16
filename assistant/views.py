@@ -55,14 +55,51 @@ class LoginView(APIView):
         return Response({'msg': 'Invalid Credentials'}, status=status.HTTP_401_UNAUTHORIZED)  # noqa: E501
     
 
-class UserHistoryView(APIView):
-   authentication_classes = (TokenAuthentication,)
-   permission_classes = (AllowAny, IsAuthenticated)
+class UserMessageView(APIView):
+  authentication_classes = (TokenAuthentication,)
+  permission_classes = (AllowAny, IsAuthenticated)
 
-   def get(self, request, *args, **kwargs):
-      history = ChatGptBot.objects.filter(user=request.user)
-      serializer = MessageSerializer(history, many=True)
-      return Response(serializer.data)
+  def get(self, request, *args, **kwargs):
+    history = ChatGptBot.objects.filter(user=request.user)
+    serializer = MessageSerializer(history, many=True)
+    return Response(serializer.data)
+  
+  def post(self, request, *args, **kwargs):
+  
+    user_input = request.POST['user_input']
+
+    #clean input from any white spaces
+    clean_user_input = str(user_input).strip()
+    #send request with user's prompt
+    """response = openai.Completion.create(
+        model="text-davinci-003",
+            prompt=clean_user_input,
+            temperature=0,
+            max_tokens=1000,
+            top_p=1,
+            frequency_penalty=0.5,
+            presence_penalty=0
+            )
+    
+    #get response
+    bot_response = response['choices'][0]['text']
+    """
+
+    if user_input:
+      assistant_response = qa_assistant.run_assistant(clean_user_input)
+      #bot_response = get_bot_response(user, clean_user_input)
+      obj, created = ChatGptBot.objects.get_or_create(
+          user=request.user,
+          messageInput=clean_user_input,
+          bot_response=assistant_response,
+      )
+
+      return JsonResponse({"bot_response": assistant_response})
+    
+    else:
+        
+        return JsonResponse({"error": "Please add an message"}, status=status.HTTP_400_BAD_REQUEST)
+
 
 
 def convert_messages(messages):
@@ -88,6 +125,7 @@ def get_bot_response(user, message):
     print("Bot: ", chat_message)
 
     return chat_message
+
 
 @csrf_exempt
 def send_message(request):
