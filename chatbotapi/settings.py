@@ -52,6 +52,7 @@ INSTALLED_APPS = [
 ]
 
 SWAGGER_SETTINGS = {
+    'USE_SESSION_AUTH': False,
     'SECURITY_DEFINITIONS': {
         'Basic': {
             'type': 'basic'
