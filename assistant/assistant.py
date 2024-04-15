@@ -35,7 +35,7 @@ class QAAssistant:
         self.client.beta.threads.messages.create(
             thread_id=self.thread.id,
             role="user",
-            content=user_question
+            content=user_question,
         )
 
         run = self.client.beta.threads.runs.create(thread_id=self.thread.id, assistant_id=self.assistant.id)

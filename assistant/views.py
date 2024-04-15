@@ -3,15 +3,19 @@ from django.contrib.auth import authenticate, login
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from .serializers import UserSerializer,RegisterSerializer, MessageSerializer
+from .serializers import UserSerializer,RegisterSerializer, MessageSerializer, SendMessageSerializer
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from rest_framework.authentication import TokenAuthentication
 from rest_framework import generics, status
+from drf_yasg.utils import swagger_auto_schema
 
 from django.http import HttpResponse, JsonResponse
 from django.forms.models import model_to_dict
 from django.views.decorators.csrf import csrf_exempt
+
+from rest_framework_swagger import renderers
+from rest_framework.decorators import api_view, renderer_classes
 
 from .assistant import QAAssistant
 from .models import ChatGptBot
@@ -64,6 +68,7 @@ class UserMessageView(APIView):
     serializer = MessageSerializer(history, many=True)
     return Response(serializer.data)
   
+  """
   def post(self, request, *args, **kwargs):
   
     user_input = request.POST['user_input']
@@ -71,20 +76,7 @@ class UserMessageView(APIView):
     #clean input from any white spaces
     clean_user_input = str(user_input).strip()
     #send request with user's prompt
-    """response = openai.Completion.create(
-        model="text-davinci-003",
-            prompt=clean_user_input,
-            temperature=0,
-            max_tokens=1000,
-            top_p=1,
-            frequency_penalty=0.5,
-            presence_penalty=0
-            )
-    
-    #get response
-    bot_response = response['choices'][0]['text']
-    """
-
+   
     if user_input:
       assistant_response = qa_assistant.run_assistant(clean_user_input)
       #bot_response = get_bot_response(user, clean_user_input)
@@ -99,7 +91,7 @@ class UserMessageView(APIView):
     else:
         
         return JsonResponse({"error": "Please add an message"}, status=status.HTTP_400_BAD_REQUEST)
-
+    """
 
 
 def convert_messages(messages):
@@ -128,6 +120,9 @@ def get_bot_response(user, message):
 
 
 @csrf_exempt
+@swagger_auto_schema(methods=['post'], request_body=SendMessageSerializer)
+@api_view(['POST'])
+@renderer_classes([renderers.OpenAPIRenderer, renderers.SwaggerUIRenderer])
 def send_message(request):
 
     user = request.user

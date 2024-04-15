@@ -59,3 +59,7 @@ class RegisterSerializer(serializers.ModelSerializer):
     user.set_password(validated_data['password'])
     user.save()
     return user
+  
+
+class SendMessageSerializer(serializers.Serializer):
+  user_input = serializers.CharField(required=True)

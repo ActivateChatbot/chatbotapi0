@@ -5,7 +5,7 @@ from .views import UserDetailAPI,RegisterUserAPIView, LoginView, UserMessageView
 urlpatterns = [
   path("get-details",UserDetailAPI.as_view()),
   path('register',RegisterUserAPIView.as_view()),
-  path('login', LoginView.as_view()),
+  #path('login', LoginView.as_view()),
   path('message', UserMessageView.as_view()),
   path('send-message', send_message),
   path('api-token-auth/', obtain_auth_token, name='api_token_auth'),
