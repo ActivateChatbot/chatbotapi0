@@ -58,7 +58,6 @@ class LoginView(APIView):
             return Response({'msg': 'Login Success', **auth_data}, status=status.HTTP_200_OK)  # noqa: E501
         return Response({'msg': 'Invalid Credentials'}, status=status.HTTP_401_UNAUTHORIZED)  # noqa: E501
     
-
 class UserMessageView(APIView):
   authentication_classes = (TokenAuthentication,)
   permission_classes = (AllowAny, IsAuthenticated)
@@ -68,7 +67,7 @@ class UserMessageView(APIView):
     serializer = MessageSerializer(history, many=True)
     return Response(serializer.data)
   
-  """
+  
   def post(self, request, *args, **kwargs):
   
     user_input = request.POST['user_input']
@@ -91,7 +90,7 @@ class UserMessageView(APIView):
     else:
         
         return JsonResponse({"error": "Please add an message"}, status=status.HTTP_400_BAD_REQUEST)
-    """
+    
 
 
 def convert_messages(messages):
