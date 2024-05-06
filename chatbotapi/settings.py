@@ -114,10 +114,10 @@ DATABASES = {
 """
 
 
-DATABASE_URL = os.getenv("DATABASE_URL")
+DATABASE_URL = os.getenv("AWS_DATABASE_URL")
 
 DATABASES = {
-    "default": dj_database_url.config(default=DATABASE_URL)
+    "default": dj_database_url.config(default="postgresql://database-1:postgoviraldb@database-1.cde8kau6o1v7.eu-north-1.rds.amazonaws.com?sslmode=require")
 }
 
 # Password validation
