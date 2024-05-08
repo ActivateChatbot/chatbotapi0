@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     "assistant",
     'drf_yasg',
     'rest_framework_swagger',
+    'whitenoise.runserver_nostatic'
 ]
 
 SWAGGER_SETTINGS = {
@@ -71,6 +72,7 @@ REST_FRAMEWORK = {
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
