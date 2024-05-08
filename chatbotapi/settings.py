@@ -117,7 +117,7 @@ DATABASES = {
 DATABASE_URL = os.getenv("AWS_DATABASE_URL")
 
 DATABASES = {
-    "default": dj_database_url.config(default="postgresql://database-1:postgoviraldb@database-1.cde8kau6o1v7.eu-north-1.rds.amazonaws.com?sslmode=require")
+    "default": dj_database_url.config(default="AWS_DATABASE_URL=postgresql://goviral:postgoviral@database-1.cde8kau6o1v7.eu-north-1.rds.amazonaws.com/database-1?sslmode=require")
 }
 
 # Password validation
@@ -155,10 +155,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
 STATIC_URL = "static/"
-STATICFILES_DIRS = [ 
-     os.path.join(BASE_DIR, 'static'), 
- ] 
-  
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
