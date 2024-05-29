@@ -49,7 +49,6 @@ INSTALLED_APPS = [
     "assistant",
     'drf_yasg',
     'rest_framework_swagger',
-    'whitenoise.runserver_nostatic'
 ]
 
 SWAGGER_SETTINGS = {
@@ -72,7 +71,6 @@ REST_FRAMEWORK = {
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
-    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -116,10 +114,10 @@ DATABASES = {
 """
 
 
-DATABASE_URL = os.getenv("AWS_DATABASE_URL")
+DATABASE_URL = os.getenv("DATABASE_URL")
 
 DATABASES = {
-    "default": dj_database_url.config(default="AWS_DATABASE_URL=postgresql://goviral:postgoviral@database-1.cde8kau6o1v7.eu-north-1.rds.amazonaws.com/database-1?sslmode=require")
+    "default": dj_database_url.config(default=DATABASE_URL)
 }
 
 # Password validation
@@ -157,7 +155,10 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
 STATIC_URL = "static/"
-STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+STATICFILES_DIRS = [ 
+     os.path.join(BASE_DIR, 'static'), 
+ ] 
+  
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field

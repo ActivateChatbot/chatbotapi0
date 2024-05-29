@@ -70,7 +70,7 @@ class UserMessageView(APIView):
   
   def post(self, request, *args, **kwargs):
   
-    user_input = request.POST.get('user_input')
+    user_input = request.POST['user_input']
 
     #clean input from any white spaces
     clean_user_input = str(user_input).strip()
