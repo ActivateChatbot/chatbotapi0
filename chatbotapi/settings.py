@@ -52,22 +52,25 @@ INSTALLED_APPS = [
 ]
 
 SWAGGER_SETTINGS = {
-    'USE_SESSION_AUTH': False,
+    'USE_SESSION_AUTH': False,  # Keep this if not using session authentication
     'SECURITY_DEFINITIONS': {
-        'Basic': {
-            'type': 'basic'
+        'Token': {
+            'type': 'apiKey',
+            'name': 'Authorization',  # Header name for token authentication
+            'in': 'header',          # Tokens are passed in the request header
         }
     }
 }
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework.authentication.TokenAuthentication',  # Add this line
+        'rest_framework.authentication.TokenAuthentication',  # Use token authentication
     ],
-    "DEFAULT_PERMISSION_CLASSES": [
-        "rest_framework.permissions.AllowAny",
-    ]
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',  # Require authentication by default
+    ],
 }
+
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",

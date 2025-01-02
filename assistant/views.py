@@ -8,6 +8,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from rest_framework.authentication import TokenAuthentication
 from rest_framework import generics, status
+from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 
 from django.http import HttpResponse, JsonResponse
@@ -15,7 +16,7 @@ from django.forms.models import model_to_dict
 from django.views.decorators.csrf import csrf_exempt
 
 from rest_framework_swagger import renderers
-from rest_framework.decorators import api_view, renderer_classes
+from rest_framework.decorators import api_view, renderer_classes, permission_classes
 
 from .assistant import QAAssistant
 from .models import ChatGptBot
@@ -119,17 +120,33 @@ def get_bot_response(user, message):
 
 
 @csrf_exempt
-@swagger_auto_schema(methods=['post'], request_body=SendMessageSerializer)
+@swagger_auto_schema(
+    methods=['post'],
+    request_body=SendMessageSerializer,
+    operation_description="Endpoint for sending a message to the chatbot",
+    responses={
+        200: openapi.Response("Successful Response", openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                'bot_response': openapi.Schema(type=openapi.TYPE_STRING, description="Chatbot response"),
+            },
+        )),
+        400: openapi.Response("Invalid input"),
+        401: openapi.Response("Unauthorized access"),
+    }
+)
 @api_view(['POST'])
+@permission_classes([IsAuthenticated])
 @renderer_classes([renderers.OpenAPIRenderer, renderers.SwaggerUIRenderer])
 def send_message(request):
 
     user = request.user
 
+    print(user)
+
     if user.is_authenticated:
         if request.method == "POST":
-            user_input = request.POST['user_input']
-
+            user_input = request.data.get('user_input')
             #clean input from any white spaces
             clean_user_input = str(user_input).strip()
             #send request with user's prompt
@@ -156,8 +173,13 @@ def send_message(request):
                   bot_response=assistant_response,
               )
 
+              print(assistant_response)
+
               return JsonResponse({"bot_response": assistant_response})
             
             else:
                
                return JsonResponse({"error": "Please add an message"}, status=status.HTTP_400_BAD_REQUEST)
+    else:
+            
+        return JsonResponse({"error": "Unauthorized Error"}, status=status.HTTP_401_UNAUTHORIZED)
