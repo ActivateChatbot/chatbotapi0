@@ -1,0 +1,47 @@
+name: Deploy ChatbotAPI Django App
+
+on:
+  push:
+    branches:
+      - main  # Triggers deployment on changes pushed to the `main` branch
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    # Step 1: Checkout the repository
+    - name: Checkout Repository
+      uses: actions/checkout@v2
+
+    # Step 2: Set up SSH key to access the VPS
+    - name: Set up SSH key
+      uses: webfactory/ssh-agent@v0.5.3
+      with:
+        ssh-private-key: ${{ secrets.FREAK_VPS_ACCESS }}  # Secret containing the SSH private key
+
+    # Step 3: Set up Python (Django requires Python)
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.9'  # Set your required Python version
+
+    # Step 4: Install dependencies on the VPS
+    - name: Install dependencies
+      run: |
+        sshpass -p ${{ secrets.FREAK_VPS_PASS }} ssh -o StrictHostKeyChecking=no -p 22 root@207.244.199.139 "cd /root/apps/chatcitizen/chatbotapi0 && git pull && source venv/bin/activate && pip install -r requirements.txt"
+
+    # Step 5: Run database migrations
+    - name: Apply Database Migrations
+      run: |
+        sshpass -p ${{ secrets.FREAK_VPS_PASS }} ssh -o StrictHostKeyChecking=no -p 22 root@207.244.199.139 "cd /root/apps/chatcitizen/chatbotapi0 && source venv/bin/activate && python manage.py migrate"
+
+    # Step 6: Collect static files
+    - name: Collect Static Files
+      run: |
+        sshpass -p ${{ secrets.FREAK_VPS_PASS }} ssh -o StrictHostKeyChecking=no -p 22 root@207.244.199.139 "cd /root/apps/chatcitizen/chatbotapi0 && source venv/bin/activate && python manage.py collectstatic --noinput"
+
+    # Step 7: Restart Gunicorn with PM2
+    - name: Restart Gunicorn with PM2
+      run: |
+        sshpass -p ${{ secrets.FREAK_VPS_PASS }} ssh -o StrictHostKeyChecking=no -p 22 root@207.244.199.139 "pm2 restart chatbotapi"
